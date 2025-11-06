@@ -28,31 +28,53 @@ public class HelpCommand extends AbstractCommand {
         StringBuilder helpText = new StringBuilder();
         helpText.append("*Доступные команды:*\n\n");
 
+        int commandNumber = 1;
         for (Command command : commandRegistry.getAllCommands()) {
-            helpText.append("/")
+            helpText.append(commandNumber++)
+                    .append(". /")
                     .append(command.getBotCommand().getCommand())
                     .append(" - ")
                     .append(command.getDescription())
                     .append("\n");
         }
 
-        helpText.append("\nДля получения подробной информации о команде используйте: /help <команда>");
+        helpText.append("\nДля подробной информации o command: /help <команда>");
+        helpText.append("\nВсего команд: ").append(commandRegistry.getCommandCount());
+
         return helpText.toString();
     }
 
     private String getSpecificHelp(String commandName) {
+        // Убираем слэш если он есть и приводим к нижнему регистру
         if (commandName.startsWith("/")) {
             commandName = commandName.substring(1);
         }
+        commandName = commandName.toLowerCase();
 
         Command command = commandRegistry.getCommand(commandName);
         if (command != null) {
-            return String.format("*Команда /%s*\n\n%s",
+            return String.format(
+                    "*Команда /%s*\n" +
+                            "*Описание:* %s\n" +
+                            "*Быстрый доступ:* Напишите /%s в чат",
                     commandName,
-                    command.getDescription());
+                    command.getDescription(),
+                    commandName
+            );
         } else {
-            return "Команда \"/" + commandName + "\" *не найдена*.\n" +
-                    "Используйте /help для просмотра всех доступных команд.";
+            return String.format(
+                    "Команда \"/%s\" не найдена.\n" +
+                            "Используйте /help для просмотра всех команд.\n" +
+                            "Проверьте правильность написания команды.",
+                    commandName
+            );
         }
+    }
+
+    @Override
+    public boolean canExecute(Message message) {
+        // HelpCommand может обрабатывать как /help, так и /help <команда>
+        return super.canExecute(message) ||
+                (message.hasText() && message.getText().startsWith("/help "));
     }
 }

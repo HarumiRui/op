@@ -6,7 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 public class StartCommand extends AbstractCommand {
 
     public StartCommand() {
-        super("start", "Запуск бота");
+        super("start", "Запуск бота если вы забыли");
     }
 
     @Override

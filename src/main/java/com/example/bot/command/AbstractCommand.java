@@ -12,6 +12,10 @@ public abstract class AbstractCommand implements Command {
         this.description = description;
     }
 
+    public String getCommandIdentifier() {
+        return command;
+    }
+
     @Override
     public BotCommand getBotCommand() {
         return new BotCommand(command, description);

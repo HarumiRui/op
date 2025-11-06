@@ -1,5 +1,6 @@
 package com.example.bot;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
@@ -9,9 +10,13 @@ public class BotApplication {
         try {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
 
+            Dotenv dotenv = Dotenv.load();
             // ЗАМЕНИТЕ на реальные данные вашего бота
-            String botUsername = "chatMy_123Bot";
-            String botToken = "8249836344:AAFG-7XUuOX2_cYmQTanFl25EY0aUc6ANTc";
+            String botUsername = dotenv.get( "TELEGRAM_BOT_NAME");
+            String botToken = dotenv.get("TELEGRAM_BOT_TOKEN");
+            if (botToken == null || botToken.isEmpty()) {
+                throw new IllegalStateException("TELEGRAM_BOT_TOKEN environment variable is not set!");
+            }
 
             ChatBot bot = new ChatBot(botUsername, botToken);
             botsApi.registerBot(bot);
@@ -21,6 +26,9 @@ public class BotApplication {
 
         } catch (TelegramApiException e) {
             System.err.println("Ошибка при запуске: " + e.getMessage());
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            System.err.println("Ошибка конфигурации: " + e.getMessage());
             e.printStackTrace();
         }
     }
